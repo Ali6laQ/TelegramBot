@@ -1,0 +1,15 @@
+services:
+  bot:
+    build: .
+    container_name: telegram-downloader-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # Keep session file across container restarts
+      - bot_session:/app/data
+      # Optional: uncomment below if you place cookies.txt next to docker-compose.yml
+      # - ./cookies.txt:/app/cookies.txt:ro
+
+volumes:
+  bot_session:

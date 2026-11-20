@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,6 +16,7 @@ class Settings:
     api_hash: str
     bot_token: str
     downloads_dir: Path
+    session_dir: Path
     max_concurrent_downloads: int
     concurrent_fragments: int
     max_file_size_mb: int
@@ -79,9 +81,25 @@ def load_settings() -> Settings:
     except ValueError as exc:
         raise ValueError("قيمة API_ID يجب أن تكون رقماً صحيحاً.") from exc
 
+    session_dir_raw = os.getenv("SESSION_DIR", "").strip()
+    if session_dir_raw:
+        session_dir = Path(session_dir_raw)
+        if not session_dir.is_absolute():
+            session_dir = BASE_DIR / session_dir
+    elif (BASE_DIR / "data").is_dir():
+        session_dir = BASE_DIR / "data"
+    else:
+        session_dir = BASE_DIR
+    session_dir.mkdir(parents=True, exist_ok=True)
+
     cookies_raw = os.getenv("COOKIES_FILE", "cookies.txt").strip()
     cookies_path: Path | None = None
-    if cookies_raw:
+    cookies_b64 = os.getenv("COOKIES_BASE64", "").strip()
+    if cookies_b64:
+        decoded_path = session_dir / "cookies.txt"
+        decoded_path.write_bytes(base64.b64decode(cookies_b64))
+        cookies_path = decoded_path
+    elif cookies_raw:
         candidate = Path(cookies_raw)
         if not candidate.is_absolute():
             candidate = BASE_DIR / candidate
@@ -98,6 +116,7 @@ def load_settings() -> Settings:
         api_hash=api_hash,
         bot_token=bot_token,
         downloads_dir=downloads_dir,
+        session_dir=session_dir,
         max_concurrent_downloads=max(1, int(os.getenv("MAX_CONCURRENT_DOWNLOADS", "3"))),
         concurrent_fragments=max(1, int(os.getenv("CONCURRENT_FRAGMENTS", "8"))),
         max_file_size_mb=max(10, max_file_size_mb),

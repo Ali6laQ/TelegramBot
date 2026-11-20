@@ -66,7 +66,7 @@ def create_bot(settings: Settings) -> Client:
         api_id=settings.api_id,
         api_hash=settings.api_hash,
         bot_token=settings.bot_token,
-        workdir=str(settings.downloads_dir.parent),
+        workdir=str(settings.session_dir),
         workers=8,
         max_concurrent_transmissions=4,
     )

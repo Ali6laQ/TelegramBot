@@ -45,3 +45,29 @@ BOT_TOKEN=1234567890:your_bot_token_here
   .venv\Scripts\pip.exe install -U "yt-dlp[default]"
   ```
 - **أمر `/status`**: أرسله للبوت للتحقق من توفر `FFmpeg` و `Node.js` و `TgCrypto` وعدد التحميلات النشطة.
+
+---
+
+## التشغيل على السيرفر 24/7 (Docker)
+
+### الخيار 1: على Railway (بدون أوامر سيرفر)
+1. ارفع المشروع إلى GitHub (مع ملف `Dockerfile`).
+2. في [Railway](https://railway.com) اختر **New Project → Deploy from GitHub repo** وحدد مستودعك.
+3. من تبويب **Variables** أضف المتغيرات الثلاثة:
+   - `API_ID`
+   - `API_HASH`
+   - `BOT_TOKEN`
+4. سيُبنى المشروع تلقائياً بـ `Dockerfile` ويعمل البوت 24/7.
+
+### الخيار 2: على أي سيرفر VPS (Azure / DigitalOcean / Oracle / Hetzner)
+```bash
+git clone https://github.com/USERNAME/REPO_NAME.git
+cd REPO_NAME
+cp .env.example .env
+nano .env   # ضع API_ID و API_HASH و BOT_TOKEN ثم احفظ
+docker compose up -d --build
+```
+لمتابعة السجلات (Logs):
+```bash
+docker compose logs -f
+```
